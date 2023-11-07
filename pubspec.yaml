@@ -59,12 +59,10 @@ flutter:
       - assets\model_satt_sn20231017-210839\keras_metadata.pb
       - assets\model_satt_sn20231017-210839\saved_model.pb
       - assets\model_satt_sn20231017-210839\fingerprint.pb
-      - assets\model_satt_sn20231017-210839\variables\variables.index
-      - assets\model_satt_sn20231017-210839\variables\variables.data-00000-of-00001
+      
       - assets\model_satt_sn20231017-211500\keras_metadata.pb
       - assets\model_satt_sn20231017-211500\saved_model.pb
-      - assets\model_satt_sn20231017-211500\variables\variables.index
-      - assets\model_satt_sn20231017-211500\variables\variables.data-00000-of-00001
+      
       - assets\model_satt_sn20231017-211500\convert.tflite
 
 
