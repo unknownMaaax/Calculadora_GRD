@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'dart:math';
 
+import 'package:app_grd/widgets/diagnostico_text.dart';
 import 'package:flutter/material.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
@@ -220,6 +221,8 @@ class _NuevaScreenState extends State<NuevaScreen> {
               child: const Text('Predecir'),
             ),
           ),
+
+          //DropdownDiagnostico(),
         ],
       ),
     );

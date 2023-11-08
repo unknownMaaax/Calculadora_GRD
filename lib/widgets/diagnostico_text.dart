@@ -1,27 +1,32 @@
-// import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-// class TextField extends StatefulWidget {
-//   const TextField({super.key});
+class DropdownDiagnostico extends StatelessWidget {
+  const DropdownDiagnostico({super.key});
 
-//   @override
-//   State<TextField> createState() => _TextFieldState();
-// }
+  static const List<String> listDiagnosticos = <String>[
+    'Diagnostico 1',
+    'Diagnostico 2',
+    'Diagnostico 3',
+    'Diagnostico 4',
+    'Diagnostico 5',
+    'Diagnostico 6',
+    'Diagnostico 766',
+  ];
 
-// // class _TextFieldState extends State<TextField> {
-// //   final diagnosticoController = TextEditingController();
-// //   @override
-// //   Widget build(BuildContext context) => Center(
-// //         child: ListView(
-// //           padding: EdgeInsets.all(32),
-// //           children: [
-// //             buildDiagnostico(),
-// //             const SizedBox(height: 24),
-// //             ElevatedButton(onPressed: () {}, child: const Text('Agregar')),
-// //           ],
-// //         ),
-// //       );
-
-// //   Widget buildDiagnostico() => TextField(
-// //         controller: diagnosticoController,
-// //       );
-// // }
+  @override
+  Widget build(BuildContext context) {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text == '') {
+          return const Iterable<String>.empty();
+        }
+        return listDiagnosticos.where((String option) {
+          return option.contains(textEditingValue.text.toLowerCase());
+        });
+      },
+      onSelected: (String selection) {
+        print('You just selected $selection');
+      },
+    );
+  }
+}
