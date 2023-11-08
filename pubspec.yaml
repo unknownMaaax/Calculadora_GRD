@@ -38,6 +38,7 @@ dependencies:
   provider: ^6.0.5
   tflite_flutter: ^0.10.3
   dropdown_textfield: ^1.0.8
+  csv: ^5.1.1
 
 dev_dependencies:
   flutter_test:
@@ -57,14 +58,15 @@ dev_dependencies:
 flutter:
 
   assets: 
-      - assets\model_satt_sn20231017-210839\keras_metadata.pb
-      - assets\model_satt_sn20231017-210839\saved_model.pb
-      - assets\model_satt_sn20231017-210839\fingerprint.pb
+      - assets/model_satt_sn20231017-210839/keras_metadata.pb
+      - assets/model_satt_sn20231017-210839/saved_model.pb
+      - assets/model_satt_sn20231017-210839/fingerprint.pb
       
-      - assets\model_satt_sn20231017-211500\keras_metadata.pb
-      - assets\model_satt_sn20231017-211500\saved_model.pb
+      - assets/model_satt_sn20231017-211500/keras_metadata.pb
+      - assets/model_satt_sn20231017-211500/saved_model.pb
       
-      - assets\model_satt_sn20231017-211500\convert.tflite
+      - assets/model_satt_sn20231017-211500/convert.tflite
+      - assets/grdsOutput.csv
 
 
   # The following line ensures that the Material Icons font is

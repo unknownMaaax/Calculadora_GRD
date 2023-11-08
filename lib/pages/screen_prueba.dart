@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:app_grd/widgets/diagnostico_text.dart';
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
 class NuevaScreen extends StatefulWidget {
@@ -107,11 +111,12 @@ class _NuevaScreenState extends State<NuevaScreen> {
 
     int elemento = output.first.indexOf(maximo);
 
-    print(output);
     print(elemento);
     print(output.first[elemento]);
     //traduccion de lista grd
     //mostrar probabilidad
+
+    traducir(elemento);
   }
 
   final diagnostico = TextEditingController();
@@ -313,5 +318,54 @@ class InputDiagnostico extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+void traducir(output) async {
+  final datosCSV = await rootBundle.loadString('assets/grdsOutput.csv');
+
+  final filaEspecifica = (output);
+  print(filaEspecifica);
+
+  List<List<dynamic>> csvTabla = const CsvToListConverter().convert(datosCSV);
+
+  // List<List<dynamic>> filasConValor = [];
+
+  // for (List<dynamic> fila in csvTabla) {
+  //   for (var valor in fila) {
+  //     if (valor.toString() == valorBuscado) {
+  //       filasConValor.add(fila);
+  //       break; // Rompemos el bucle interno cuando encontramos el valor en la fila.
+  //     }
+  //   }
+  // }
+
+  // if (filasConValor.isNotEmpty) {
+  //   for (List<dynamic> fila in filasConValor) {
+  //     print(fila);
+  //   }
+  // } else {
+  //   print("No se encontraron filas con el valor $valorBuscado.");
+  // }
+
+  if (filaEspecifica >= 0 && filaEspecifica < csvTabla.length) {
+    List<dynamic> filaGuardada = csvTabla[filaEspecifica];
+    print("Fila $filaEspecifica: $filaGuardada"); // Imprime la fila específica
+
+    String valorColumna1 = filaGuardada[0]
+        .toString(); // Suponiendo que el valor se encuentra en la primera columna
+    List<String> valoresSeparados = valorColumna1.split(';');
+
+    if (valoresSeparados.length >= 2) {
+      String codigoGRD = valoresSeparados[1];
+      String DescripcionGRD = valoresSeparados[2];
+
+      print("El GRD predecido es $codigoGRD");
+      print("Otra variable: $DescripcionGRD");
+    } else {
+      print("No se encontraron valores separados en la columna 1.");
+    }
+  } else {
+    print("El índice de fila especificado está fuera de rango.");
   }
 }
