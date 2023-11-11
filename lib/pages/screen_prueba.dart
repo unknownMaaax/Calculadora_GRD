@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:app_grd/widgets/diagnostico_text.dart';
+import 'package:app_grd/widgets/procedimiento_text.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -146,33 +147,36 @@ class _NuevaScreenState extends State<NuevaScreen> {
       body: ListView(
         children: [
           appBar(),
-          InputDiagnostico(diagnostico: diagnostico),
-          Container(
-            //botonDiagnostico
-            // padding: const EdgeInsets.all(25),
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              onPressed: () {
-                diag = diagnostico.text;
-                listDiagnosticos.add(diag);
-                print(listDiagnosticos);
-              },
-              child: const Text('Agregar'),
-            ),
-          ),
-          InputProcedimiento(procedimiento: procedimiento),
-          Container(
-            // padding: const EdgeInsets.all(25),
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              onPressed: () {
-                proc = procedimiento.text;
-                listProcedimientos.add(proc);
-                print(listProcedimientos);
-              },
-              child: const Text('Agregar'),
-            ),
-          ),
+          // InputDiagnostico(diagnostico: diagnostico),
+          const DiagnosticoDropdown(),
+          // Container(
+          //   //botonDiagnostico
+          //   // padding: const EdgeInsets.all(25),
+          //   alignment: Alignment.center,
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       diag = diagnostico.text;
+          //       listDiagnosticos.add(diag);
+          //       print(listDiagnosticos);
+          //       lista();
+          //     },
+          //     child: const Text('Agregar'),
+          //   ),
+          // ),
+          // InputProcedimiento(procedimiento: procedimiento),
+          const ProcedimientoDropdown(),
+          // Container(
+          //   // padding: const EdgeInsets.all(25),
+          //   alignment: Alignment.center,
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       proc = procedimiento.text;
+          //       listProcedimientos.add(proc);
+          //       print(listProcedimientos);
+          //     },
+          //     child: const Text('Agregar'),
+          //   ),
+          // ),
           // Row(mainAxisAlignment: MainAxisAlignment.center, children: [
 
           CheckboxListTile(
@@ -323,31 +327,11 @@ class InputDiagnostico extends StatelessWidget {
 
 void traducir(output) async {
   final datosCSV = await rootBundle.loadString('assets/grdsOutput.csv');
-
   final filaEspecifica = (output);
-  print(filaEspecifica);
-
+  // print(filaEspecifica);
   List<List<dynamic>> csvTabla = const CsvToListConverter().convert(datosCSV);
 
-  // List<List<dynamic>> filasConValor = [];
-
-  // for (List<dynamic> fila in csvTabla) {
-  //   for (var valor in fila) {
-  //     if (valor.toString() == valorBuscado) {
-  //       filasConValor.add(fila);
-  //       break; // Rompemos el bucle interno cuando encontramos el valor en la fila.
-  //     }
-  //   }
-  // }
-
-  // if (filasConValor.isNotEmpty) {
-  //   for (List<dynamic> fila in filasConValor) {
-  //     print(fila);
-  //   }
-  // } else {
-  //   print("No se encontraron filas con el valor $valorBuscado.");
-  // }
-
+  //buscador de fila entregada por el output del modelo para que la muestre al usuario con GRD y Descripcion
   if (filaEspecifica >= 0 && filaEspecifica < csvTabla.length) {
     List<dynamic> filaGuardada = csvTabla[filaEspecifica];
     print("Fila $filaEspecifica: $filaGuardada"); // Imprime la fila específica
@@ -358,14 +342,24 @@ void traducir(output) async {
 
     if (valoresSeparados.length >= 2) {
       String codigoGRD = valoresSeparados[1];
-      String DescripcionGRD = valoresSeparados[2];
+      String descripcionGRD = valoresSeparados[2];
 
       print("El GRD predecido es $codigoGRD");
-      print("Otra variable: $DescripcionGRD");
+      print("Otra variable: $descripcionGRD");
     } else {
       print("No se encontraron valores separados en la columna 1.");
     }
   } else {
     print("El índice de fila especificado está fuera de rango.");
   }
+}
+
+void lista() async {
+  final datosCSV = await rootBundle.loadString('assets/diag.csv');
+  List<List<dynamic>> csvDiag = const CsvToListConverter().convert(datosCSV);
+
+  String csv = const ListToCsvConverter().convert(csvDiag);
+
+  print('Contenido del archivo:');
+  print(csv);
 }
