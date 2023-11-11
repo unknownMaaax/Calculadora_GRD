@@ -1,25 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:app_grd/widgets/model.dart';
 import 'package:csv/csv.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-// class DiagnosticoDropDown extends StatefulWidget {
-//   const DiagnosticoDropDown({super.key});
-
-//   @override
-//   State<DiagnosticoDropDown> createState() => _DiagnosticoDropDownState();
-// }
-
-// class _DiagnosticoDropDownState extends State<DiagnosticoDropDown> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Placeholder();
-//   }
-// }
 List countriesList = [
   'Fiebre',
   'caca',
@@ -47,16 +35,6 @@ class DiagnosticoDropdown extends StatefulWidget {
 }
 
 class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
-  String holder = '';
-
-  String dropdownDiagnostico = '';
-
-  void getDropDownItem() {
-    setState(() {
-      holder = dropdownDiagnostico;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -73,14 +51,17 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
         popupProps: const PopupProps.menu(
           showSearchBox: true,
         ),
-
         selectedItem: itemSelected,
       ),
       const SizedBox(height: 5),
       ElevatedButton(
         onPressed: () {
           diagnostico = itemSelected;
-          print(diagnostico);
+
+          Provider.of<ProcedimientoModel>(context, listen: false)
+              .setDiagnostico(diagnostico);
+          // print(diagnostico);
+
           //diagnostico traducir a codigo de csv
           //codigo csv añadir a lista diagnostico
           // rellenar la lista de diagnosticos a 35 elementos

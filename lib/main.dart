@@ -1,9 +1,19 @@
 import 'package:app_grd/pages/calculadora_screen.dart';
 import 'package:app_grd/pages/screen_prueba.dart';
 import 'package:app_grd/theme/app_theme.dart';
+import 'package:app_grd/widgets/model.dart';
+import 'package:app_grd/widgets/procedimiento_text.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ProcedimientoModel(),
+      child: const MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

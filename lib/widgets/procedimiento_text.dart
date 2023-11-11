@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:app_grd/pages/screen_prueba.dart';
+import 'package:app_grd/widgets/model.dart';
 import 'package:csv/csv.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 List countriesList = [
   'Fiebre',
@@ -34,16 +36,6 @@ class ProcedimientoDropdown extends StatefulWidget {
 }
 
 class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
-  String holder = '';
-
-  String dropdownProcedimiento = '';
-
-  void getDropDownItem() {
-    setState(() {
-      holder = dropdownProcedimiento;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -60,14 +52,21 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
         popupProps: const PopupProps.menu(
           showSearchBox: true,
         ),
-
         selectedItem: itemSelected,
       ),
       const SizedBox(height: 5),
       ElevatedButton(
         onPressed: () {
           procedimiento = itemSelected;
-          print(procedimiento);
+          // print(procedimiento);
+
+          Provider.of<ProcedimientoModel>(context, listen: false)
+              .setProcedimiento(procedimiento);
+          // Haz lo mismo para diagnostico si es necesario
+
+          // listProcedimientos.add(procedimiento);
+          // print(listProcedimientos);
+
           //diagnostico traducir a codigo de csv
           //codigo csv añadir a lista diagnostico
           // rellenar la lista de diagnosticos a 35 elementos

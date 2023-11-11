@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:app_grd/widgets/diagnostico_text.dart';
+import 'package:app_grd/widgets/model.dart';
 import 'package:app_grd/widgets/procedimiento_text.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
 class NuevaScreen extends StatefulWidget {
@@ -18,12 +19,12 @@ class NuevaScreen extends StatefulWidget {
 }
 
 class _NuevaScreenState extends State<NuevaScreen> {
-  Future<void> miFuncionAsincrona() async {
+  Future<void> miFuncionAsincrona(diagnostico, procedimiento) async {
     // Tu código aquí
     final interpreter = await Interpreter.fromAsset(
         'assets/model_satt_sn20231017-211500/convert.tflite');
-    var input2 = interpreter.getInputTensor(0);
 
+    var input2 = interpreter.getInputTensor(0);
     var input = [
       1010.0,
       877.0,
@@ -94,16 +95,11 @@ class _NuevaScreenState extends State<NuevaScreen> {
       65.0,
       0.0,
     ];
-
     input2.setTo(input);
-    print(input2);
+    // print(input2);
 
     var outputList = List.filled(1 * 210, 0.0);
     var output = [outputList];
-
-    var output2 = interpreter.getOutputTensors().first;
-
-    // output2.setTo(output);
 
     interpreter.run(input2.data, output);
 
@@ -116,8 +112,9 @@ class _NuevaScreenState extends State<NuevaScreen> {
     print(output.first[elemento]);
     //traduccion de lista grd
     //mostrar probabilidad
-
-    traducir(elemento);
+    // traducir(elemento);
+    print(diagnostico);
+    print(procedimiento);
   }
 
   final diagnostico = TextEditingController();
@@ -143,41 +140,15 @@ class _NuevaScreenState extends State<NuevaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String procedimiento =
+        Provider.of<ProcedimientoModel>(context).procedimiento;
+    String diagnostico = Provider.of<ProcedimientoModel>(context).diagnostico;
     return Scaffold(
       body: ListView(
         children: [
           appBar(),
-          // InputDiagnostico(diagnostico: diagnostico),
           const DiagnosticoDropdown(),
-          // Container(
-          //   //botonDiagnostico
-          //   // padding: const EdgeInsets.all(25),
-          //   alignment: Alignment.center,
-          //   child: ElevatedButton(
-          //     onPressed: () {
-          //       diag = diagnostico.text;
-          //       listDiagnosticos.add(diag);
-          //       print(listDiagnosticos);
-          //       lista();
-          //     },
-          //     child: const Text('Agregar'),
-          //   ),
-          // ),
-          // InputProcedimiento(procedimiento: procedimiento),
           const ProcedimientoDropdown(),
-          // Container(
-          //   // padding: const EdgeInsets.all(25),
-          //   alignment: Alignment.center,
-          //   child: ElevatedButton(
-          //     onPressed: () {
-          //       proc = procedimiento.text;
-          //       listProcedimientos.add(proc);
-          //       print(listProcedimientos);
-          //     },
-          //     child: const Text('Agregar'),
-          //   ),
-          // ),
-          // Row(mainAxisAlignment: MainAxisAlignment.center, children: [
 
           CheckboxListTile(
             title: const Text('Hombre'),
@@ -225,7 +196,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
                 // print(combinacionInput);
                 // interpreter.run(input, output);
                 // print(output);
-                miFuncionAsincrona();
+                miFuncionAsincrona(diagnostico, procedimiento);
               },
               child: const Text('Predecir'),
             ),
