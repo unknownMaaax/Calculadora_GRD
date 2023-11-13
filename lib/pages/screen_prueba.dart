@@ -248,58 +248,10 @@ class InputEdad extends StatelessWidget {
   }
 }
 
-//textfield procedimiento
-class InputProcedimiento extends StatelessWidget {
-  const InputProcedimiento({
-    super.key,
-    required this.procedimiento,
-  });
-
-  final TextEditingController procedimiento;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      child: TextField(
-        controller: procedimiento,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'Procedimiento',
-        ),
-      ),
-    );
-  }
-}
-
-//textfield diagnostico
-class InputDiagnostico extends StatelessWidget {
-  const InputDiagnostico({
-    super.key,
-    required this.diagnostico,
-  });
-
-  final TextEditingController diagnostico;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      child: TextField(
-        controller: diagnostico,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'G00.0',
-        ),
-      ),
-    );
-  }
-}
-
 void traducir(output) async {
   final datosCSV = await rootBundle.loadString('assets/grdsOutput.csv');
   final filaEspecifica = (output);
-  // print(filaEspecifica);
+
   List<List<dynamic>> csvTabla = const CsvToListConverter().convert(datosCSV);
 
   //buscador de fila entregada por el output del modelo para que la muestre al usuario con GRD y Descripcion
@@ -323,14 +275,4 @@ void traducir(output) async {
   } else {
     print("El índice de fila especificado está fuera de rango.");
   }
-}
-
-void lista() async {
-  final datosCSV = await rootBundle.loadString('assets/diag.csv');
-  List<List<dynamic>> csvDiag = const CsvToListConverter().convert(datosCSV);
-
-  String csv = const ListToCsvConverter().convert(csvDiag);
-
-  print('Contenido del archivo:');
-  print(csv);
 }
