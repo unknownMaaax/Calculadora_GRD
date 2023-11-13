@@ -9,17 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-List countriesList = [
-  'Fiebre',
-  'caca',
-  'peo',
-  'A02.8;OTRAS INFECCIONES ESPECIFICADAS COMO DEBIDAS A SALMONELLA',
-  'Indonesia'
-];
 String itemSelected = '';
 String procedimiento = '';
 String procedimientoTraducido = '';
 List<String> listProcedimientos = [];
+String codigo = '';
+List<String> listaCodigosProcedimiento = [];
 
 class ProcedimientoDropdown extends StatefulWidget {
   const ProcedimientoDropdown({super.key});
@@ -45,43 +40,36 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
     // print(listProcedimientos[1]);
   }
 
-  void buscarProcedimiento(String procedimientoFunc) async {
+  Future<String?> buscarProcedimiento(String procedimientoFunc) async {
     try {
       String csvString = await rootBundle.loadString('assets/proc.csv');
       List<String> lines = LineSplitter.split(csvString).toList();
       String targetValue = procedimientoFunc;
       String? resultRow;
       print("Función $procedimientoFunc");
-
       for (var row in lines) {
         final values = row.split(';');
-        print("Values: $values");
+        // print("Values: $values");
 
         if (values.length >= 3 && values[2].trim() == targetValue.trim()) {
           resultRow = row;
           break;
         }
       }
-
       if (resultRow != null) {
-        print('Fila encontrada: $resultRow');
-
+        // print('Fila encontrada: $resultRow');
         // Ahora puedes separar los datos usando el punto y coma
         List<String> datos = resultRow.split(';');
-        String codigo = datos[0];
-        String valor = datos[1];
-        String procedimiento = datos[2];
-
+        codigo = datos[0];
         print('Código: $codigo');
-        print('Valor: $valor');
-        print('Procedimiento: $procedimiento');
         // Agrega más líneas según sea necesario para procesar los datos.
       } else {
-        print('No se encontró la fila con el procedimiento deseado.');
+        // print('No se encontró la fila con el procedimiento deseado.');
       }
     } catch (e) {
-      print('Error al leer el archivo: $e');
+      // print('Error al leer el archivo: $e');
     }
+    return codigo;
   }
 
   @override
@@ -102,18 +90,15 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
       ),
       const SizedBox(height: 5),
       ElevatedButton(
-        onPressed: () {
+        onPressed: () async {
           procedimiento = itemSelected;
-          // print(procedimiento.toString());
-          buscarProcedimiento(procedimiento.toString());
-          //enviar datos a pantalla incial para funcion de predecir
-          Provider.of<ProcedimientoModel>(context, listen: false)
-              .setProcedimiento(procedimiento);
-          itemSelected = '';
-
-          //!diagnostico traducir a codigo de csv
-          //!rellenar la lista de diagnosticos a 35 elementos
+          String? codigoProc = await buscarProcedimiento(procedimiento);
+          listaCodigosProcedimiento.add(codigoProc!);
           //*enviar datos a ScreenPrueba para funcion de predecir
+          Provider.of<ProcedimientoModel>(context, listen: false)
+              .setProcedimiento(listaCodigosProcedimiento);
+          itemSelected = '';
+          //!rellenar la lista de diagnosticos a 35 elementos en pantalla incial
         },
         child: const Text('Agregar'),
       )

@@ -3,19 +3,19 @@
 import 'package:flutter/foundation.dart';
 
 class ProcedimientoModel extends ChangeNotifier {
-  String _procedimiento = '';
-  String _diagnostico = '';
+  List<String>? _procedimiento;
+  List<String>? _diagnostico;
 
-  String get procedimiento => _procedimiento;
-  String get diagnostico => _diagnostico;
+  List<String>? get procedimiento => _procedimiento;
+  List<String>? get diagnostico => _diagnostico;
 
-  void setProcedimiento(String value) {
-    _procedimiento = value;
+  void setProcedimiento(List<String> listaCodigosProcedimiento) {
+    _procedimiento = listaCodigosProcedimiento;
     notifyListeners();
   }
 
-  void setDiagnostico(String value) {
-    _diagnostico = value;
+  void setDiagnostico(List<String> listaCodigos) {
+    _diagnostico = listaCodigos;
     notifyListeners();
   }
 }

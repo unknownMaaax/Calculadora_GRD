@@ -10,16 +10,11 @@ import 'package:flutter/services.dart';
 import 'package:excel/excel.dart';
 import 'package:provider/provider.dart';
 
-List countriesList = [
-  'Fiebre',
-  'caca',
-  'peo',
-  'A02.8;OTRAS INFECCIONES ESPECIFICADAS COMO DEBIDAS A SALMONELLA',
-  'Indonesia'
-];
 String itemSelected = '';
 String diagnostico = '';
 List<String> listDiagnosticos = [];
+String codigo = '';
+List<String> listaCodigos = [];
 
 class DiagnosticoDropdown extends StatefulWidget {
   const DiagnosticoDropdown({super.key});
@@ -44,7 +39,7 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
     listDiagnosticos = _data;
   }
 
-  void buscarDiagnostico(String diagnostico) async {
+  Future<String?> buscarDiagnostico(String diagnostico) async {
     try {
       String csvString = await rootBundle.loadString('assets/diag.csv');
       List<String> lines = LineSplitter.split(csvString).toList();
@@ -65,20 +60,16 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
 
         // Ahora puedes separar los datos usando el punto y coma
         List<String> datos = resultRow.split(';');
-        String codigo = datos[0];
-        String valor = datos[1];
-        String procedimiento = datos[2];
-
+        codigo = datos[0];
         print('Código: $codigo');
-        print('Valor: $valor');
-        print('Procedimiento: $procedimiento');
         // Agrega más líneas según sea necesario para procesar los datos.
       } else {
-        print('No se encontró la fila con el procedimiento deseado.');
+        // print('No se encontró la fila con el procedimiento deseado.');
       }
     } catch (e) {
-      print('Error al leer el archivo: $e');
+      // print('Error al leer el archivo: $e');
     }
+    return codigo;
   }
 
   @override
@@ -99,16 +90,18 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
       ),
       const SizedBox(height: 5),
       ElevatedButton(
-        onPressed: () {
+        onPressed: () async {
           diagnostico = itemSelected;
-          buscarDiagnostico(diagnostico);
-          //enviar datos a pantalla incial para funcion de predecir
+          //*traducimos el codigo de diagnostico
+          String? codigoDiag = await buscarDiagnostico(diagnostico);
+          listaCodigos.add(codigoDiag!);
+          print(listaCodigos);
+
+          ///*enviar datos a ScreenPrueba para funcion de predecir
           Provider.of<ProcedimientoModel>(context, listen: false)
-              .setDiagnostico(diagnostico);
+              .setDiagnostico(listaCodigos);
           itemSelected = '';
-          //!diagnostico traducir a codigo de csv
-          //!rellenar la lista de diagnosticos a 35 elementos
-          //*enviar datos a ScreenPrueba para funcion de predecir
+          //!rellenar la lista de diagnosticos a 35 elementos en pantalla inicia
         },
         child: const Text('Agregar'),
       )

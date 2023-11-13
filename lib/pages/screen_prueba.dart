@@ -19,6 +19,15 @@ class NuevaScreen extends StatefulWidget {
 }
 
 class _NuevaScreenState extends State<NuevaScreen> {
+  String diag = '';
+  String proc = '';
+  String ed = '';
+  String sexo = '';
+  var listDiagnosticos = [];
+  var listProcedimientos = [];
+  var listSexo = [];
+  var listEdad = [];
+
   Future<void> miFuncionAsincrona(diagnostico, procedimiento) async {
     // Tu código aquí
     final interpreter = await Interpreter.fromAsset(
@@ -114,6 +123,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
     //mostrar probabilidad
     // traducir(elemento);
     print(diagnostico);
+
     print(procedimiento);
   }
 
@@ -122,16 +132,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
   // final sexo = TextEditingController();
   final edad = TextEditingController();
 
-  String diag = '';
-  String proc = '';
-  String ed = '';
-  String sexo = ''; //hombre 1, mujer 0
-
-  var listDiagnosticos = [];
-  //assert(listDiagnosticos.length == 35);
-  var listProcedimientos = [];
-  var listSexo = [];
-  var listEdad = [];
+  //hombre 1, mujer 0
 
   bool _valueHombre = false;
   bool _valueMujer = false;
@@ -140,14 +141,25 @@ class _NuevaScreenState extends State<NuevaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String procedimiento =
+    List<String>? procedimiento =
         Provider.of<ProcedimientoModel>(context).procedimiento;
-    String diagnostico = Provider.of<ProcedimientoModel>(context).diagnostico;
+    List<String>? diagnostico =
+        Provider.of<ProcedimientoModel>(context).diagnostico;
     return Scaffold(
       body: ListView(
         children: [
           appBar(),
+          const SizedBox(height: 10),
+          const Text(
+            'Ingrese los diagnosticos:',
+            style: TextStyle(fontSize: 15),
+          ),
           const DiagnosticoDropdown(),
+          const SizedBox(height: 10),
+          const Text(
+            'Ingrese los diagnosticos:',
+            style: TextStyle(fontSize: 15),
+          ),
           const ProcedimientoDropdown(),
 
           CheckboxListTile(
@@ -183,16 +195,16 @@ class _NuevaScreenState extends State<NuevaScreen> {
                 ed = edad.text;
                 listEdad.add(ed);
                 listSexo.add(sexo);
-                for (int i = 0; listDiagnosticos.length < 35; i++) {
-                  listDiagnosticos.add('');
-                }
+                // for (int i = 0; listDiagnosticos.length < 35; i++) {
+                //   listDiagnosticos.add('');
+                // }
                 //concatenar listas
-                combinacionInput = [
-                  ...listDiagnosticos,
-                  ...listProcedimientos,
-                  ...listSexo,
-                  ...listEdad
-                ];
+                // combinacionInput = [
+                //   ...listDiagnosticos,
+                //   ...listProcedimientos,
+                //   ...listSexo,
+                //   ...listEdad
+                // ];
                 // print(combinacionInput);
                 // interpreter.run(input, output);
                 // print(output);
