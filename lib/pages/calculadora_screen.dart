@@ -1,7 +1,3 @@
-import 'package:app_grd/widgets/diagnostico_text.dart';
-
-import 'package:app_grd/widgets/procedimiento_text.dart';
-import 'package:app_grd/widgets/sexo_radiobutton.dart';
 import 'package:flutter/material.dart';
 
 class CalculadoraScreen extends StatelessWidget {

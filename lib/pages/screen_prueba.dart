@@ -1,7 +1,3 @@
-import 'dart:convert';
-import 'dart:ffi';
-import 'dart:io';
-import 'dart:math';
 import 'package:app_grd/widgets/diagnostico_text.dart';
 import 'package:app_grd/widgets/model.dart';
 import 'package:app_grd/widgets/procedimiento_text.dart';
@@ -19,16 +15,15 @@ class NuevaScreen extends StatefulWidget {
 }
 
 class _NuevaScreenState extends State<NuevaScreen> {
-  String diag = '';
-  String proc = '';
   String ed = '';
   String sexo = '';
   var listDiagnosticos = [];
   var listProcedimientos = [];
   var listSexo = [];
   var listEdad = [];
+  String probabilidad = '';
 
-  Future<void> miFuncionAsincrona(diagnostico, procedimiento) async {
+  Future<void> predecirDatos(diagnostico, procedimiento) async {
     // Tu código aquí
     final interpreter = await Interpreter.fromAsset(
         'assets/model_satt_sn20231017-211500/convert.tflite');
@@ -116,15 +111,15 @@ class _NuevaScreenState extends State<NuevaScreen> {
         .reduce((value, element) => value > element ? value : element);
 
     int elemento = output.first.indexOf(maximo);
+    setState(() {
+      probabilidad = output.first[elemento].toString();
+    });
 
     print(elemento);
-    print(output.first[elemento]);
+    print(probabilidad); //mostrar solo el valor de la probabilidad
     //traduccion de lista grd
     //mostrar probabilidad
     // traducir(elemento);
-    print(diagnostico);
-
-    print(procedimiento);
   }
 
   final diagnostico = TextEditingController();
@@ -149,71 +144,113 @@ class _NuevaScreenState extends State<NuevaScreen> {
       body: ListView(
         children: [
           appBar(),
-          const SizedBox(height: 10),
-          const Text(
-            'Ingrese los diagnosticos:',
-            style: TextStyle(fontSize: 15),
-          ),
-          const DiagnosticoDropdown(),
-          const SizedBox(height: 10),
-          const Text(
-            'Ingrese los diagnosticos:',
-            style: TextStyle(fontSize: 15),
-          ),
-          const ProcedimientoDropdown(),
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(children: [
+              const SizedBox(height: 10),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Ingrese los Diagnosticos:',
+                  style: TextStyle(fontSize: 15),
+                ),
+              ),
+              const DiagnosticoDropdown(),
+              const SizedBox(height: 10),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Ingrese los Procedimientos:',
+                  style: TextStyle(fontSize: 15),
+                ),
+              ),
+              const ProcedimientoDropdown(),
+              const SizedBox(height: 5),
+              CheckboxListTile(
+                title: const Text('Hombre'),
+                value: _valueHombre,
+                onChanged: (value) {
+                  setState(() {
+                    _valueHombre = value!;
+                    _valueMujer = false;
+                    sexo = value ? '1' : '';
+                  });
+                },
+              ),
+              CheckboxListTile(
+                title: const Text('Mujer'),
+                value: _valueMujer,
+                onChanged: (value) {
+                  setState(() {
+                    _valueMujer = value!;
+                    _valueHombre = false;
+                    sexo = value ? '0' : '';
+                  });
+                },
+              ),
+              InputEdad(edad: edad),
+              const SizedBox(height: 5),
+              Container(
+                // padding: const EdgeInsets.all(25),
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    ed = edad.text;
+                    listEdad.add(ed);
+                    listSexo.add(sexo);
+                    print(procedimiento);
+                    print(diagnostico);
+                    //Añadir espacios en blanco a diagnostico y procedimiento
+                    //concatenar listas
+                    //enviar la lista a funcion predecir
 
-          CheckboxListTile(
-            title: const Text('Hombre'),
-            value: _valueHombre,
-            onChanged: (value) {
-              setState(() {
-                _valueHombre = value!;
-                _valueMujer = false;
-                sexo = value ? 'H' : '';
-              });
-            },
-          ),
-          CheckboxListTile(
-            title: const Text('Mujer'),
-            value: _valueMujer,
-            onChanged: (value) {
-              setState(() {
-                _valueMujer = value!;
-                _valueHombre = false;
-                sexo = value ? 'M' : '';
-              });
-            },
-          ),
+                    //enviar valor de predecir a traducir
+                    //resultado de traducir mostrar en pantalla EN UN BOX
 
-          InputEdad(edad: edad),
-          // ]),
-          Container(
-            // padding: const EdgeInsets.all(25),
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              onPressed: () async {
-                ed = edad.text;
-                listEdad.add(ed);
-                listSexo.add(sexo);
-                // for (int i = 0; listDiagnosticos.length < 35; i++) {
-                //   listDiagnosticos.add('');
-                // }
-                //concatenar listas
-                // combinacionInput = [
-                //   ...listDiagnosticos,
-                //   ...listProcedimientos,
-                //   ...listSexo,
-                //   ...listEdad
-                // ];
-                // print(combinacionInput);
-                // interpreter.run(input, output);
-                // print(output);
-                miFuncionAsincrona(diagnostico, procedimiento);
-              },
-              child: const Text('Predecir'),
-            ),
-          ),
-
+                    // for (int i = 0; listDiagnosticos.length < 35; i++) {
+                    //   listDiagnosticos.add('');
+                    // }
+                    //concatenar listas
+                    // combinacionInput = [
+                    //   ...listDiagnosticos,
+                    //   ...listProcedimientos,
+                    //   ...listSexo,
+                    //   ...listEdad
+                    // ];
+                    // print(combinacionInput);
+                    // interpreter.run(input, output);
+                    // print(output);
+                    //!ENVIAR SOLO UN DATO A LA FUNCION PREDECIR
+                    predecirDatos(diagnostico, procedimiento);
+                  },
+                  child: const Text('Predecir'),
+                ),
+              ),
+              const SizedBox(height: 5),
+              Container(
+                width: MediaQuery.of(context).size.width *
+                    0.9, // 90% del ancho de la pantalla
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(5.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 2,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  probabilidad, // *'Probabilidad : $probabilidad',y el GRD obtenido y descripcion
+                  style: const TextStyle(
+                      fontSize: 24.0), // Tamaño de texto más grande
+                ),
+              ),
+            ]),
+          )
           //DropdownDiagnostico(),
         ],
       ),
@@ -247,14 +284,11 @@ class InputEdad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      child: TextField(
-        controller: edad,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'Edad',
-        ),
+    return TextField(
+      controller: edad,
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        hintText: 'Edad',
       ),
     );
   }
