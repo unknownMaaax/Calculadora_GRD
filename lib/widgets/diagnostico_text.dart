@@ -90,8 +90,12 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
           diagnostico = itemSelected;
           //*traducimos el codigo de diagnostico
           String? codigoDiag = await buscarDiagnostico(diagnostico);
-          listaCodigos.add(codigoDiag!);
-          print(listaCodigos);
+          if (listDiagnosticos.length != 35 &&
+              codigoDiag != null &&
+              diagnostico != '') {
+            listaCodigos.add(codigoDiag);
+            print(listaCodigos);
+          }
 
           ///*enviar datos a ScreenPrueba para funcion de predecir
           Provider.of<ProcedimientoModel>(context, listen: false)

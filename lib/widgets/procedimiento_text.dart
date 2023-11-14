@@ -10,7 +10,7 @@ String itemSelected = '';
 String procedimiento = '';
 String procedimientoTraducido = '';
 List<String> listProcedimientos = [];
-String codigo = '';
+int codigo = 0;
 List<String> listaCodigosProcedimiento = [];
 
 class ProcedimientoDropdown extends StatefulWidget {
@@ -57,7 +57,8 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
         // print('Fila encontrada: $resultRow');
         // Ahora puedes separar los datos usando el punto y coma
         List<String> datos = resultRow.split(';');
-        codigo = datos[0];
+
+        codigo = (int.parse(datos[0]) + 3648);
         print('Código: $codigo');
         // Agrega más líneas según sea necesario para procesar los datos.
       } else {
@@ -66,7 +67,7 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
     } catch (e) {
       // print('Error al leer el archivo: $e');
     }
-    return codigo;
+    return codigo.toString();
   }
 
   @override
@@ -90,7 +91,11 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
         onPressed: () async {
           procedimiento = itemSelected;
           String? codigoProc = await buscarProcedimiento(procedimiento);
-          listaCodigosProcedimiento.add(codigoProc!);
+          if (listaCodigosProcedimiento.length != 35 &&
+              codigoProc != null &&
+              procedimiento != '') {
+            listaCodigosProcedimiento.add(codigoProc);
+          }
           //*enviar datos a ScreenPrueba para funcion de predecir
           Provider.of<ProcedimientoModel>(context, listen: false)
               .setProcedimiento(listaCodigosProcedimiento);

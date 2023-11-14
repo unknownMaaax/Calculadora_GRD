@@ -17,19 +17,26 @@ class NuevaScreen extends StatefulWidget {
 class _NuevaScreenState extends State<NuevaScreen> {
   String ed = '';
   String sexo = '';
-  var listDiagnosticos = [];
-  var listProcedimientos = [];
+  String listaFinal = '';
   var listSexo = [];
   var listEdad = [];
+  var listPrimerDiagnostico = [];
+  String primerDiagnostico = '';
   String probabilidad = '';
+  String codigoGRD = '';
+  String descripcionGRD = '';
+  final diagnostico = TextEditingController();
+  final procedimiento = TextEditingController();
+  // final sexo = TextEditingController();
+  final edad = TextEditingController();
 
-  Future<void> predecirDatos(diagnostico, procedimiento) async {
+  Future<void> predecirDatos(input) async {
     // Tu código aquí
     final interpreter = await Interpreter.fromAsset(
         'assets/model_satt_sn20231017-211500/convert.tflite');
 
     var input2 = interpreter.getInputTensor(0);
-    var input = [
+    var input3 = [
       1010.0,
       877.0,
       529.0,
@@ -99,7 +106,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
       65.0,
       0.0,
     ];
-    input2.setTo(input);
+    input2.setTo(input3);
     // print(input2);
 
     var outputList = List.filled(1 * 210, 0.0);
@@ -115,17 +122,46 @@ class _NuevaScreenState extends State<NuevaScreen> {
       probabilidad = output.first[elemento].toString();
     });
 
-    print(elemento);
-    print(probabilidad); //mostrar solo el valor de la probabilidad
+    // print(elemento);
+    // print(probabilidad); //mostrar solo el valor de la probabilidad
     //traduccion de lista grd
     //mostrar probabilidad
-    // traducir(elemento);
+    traducir(elemento, probabilidad);
   }
 
-  final diagnostico = TextEditingController();
-  final procedimiento = TextEditingController();
-  // final sexo = TextEditingController();
-  final edad = TextEditingController();
+  void traducir(output, probabilidadGRD) async {
+    final datosCSV = await rootBundle.loadString('assets/grdsOutput.csv');
+    final filaEspecifica = (output);
+
+    List<List<dynamic>> csvTabla = const CsvToListConverter().convert(datosCSV);
+
+    //buscador de fila entregada por el output del modelo para que la muestre al usuario con GRD y Descripcion
+    if (filaEspecifica >= 0 && filaEspecifica < csvTabla.length) {
+      List<dynamic> filaGuardada = csvTabla[filaEspecifica];
+      // print(
+      //     "Fila $filaEspecifica: $filaGuardada"); // Imprime la fila específica
+
+      String valorColumna1 = filaGuardada[0]
+          .toString(); // Suponiendo que el valor se encuentra en la primera columna
+      List<String> valoresSeparados = valorColumna1.split(';');
+
+      if (valoresSeparados.length >= 2) {
+        setState(() {
+          codigoGRD = valoresSeparados[1];
+          descripcionGRD = valoresSeparados[2];
+          listaFinal =
+              'Se predijo el GRD: $codigoGRD,\n $descripcionGRD \n probabilidad de $probabilidadGRD';
+        });
+
+        // print("El GRD predecido es $codigoGRD");
+        // print("Otra variable: $descripcionGRD");
+      } else {
+        // print("No se encontraron valores separados en la columna 1.");
+      }
+    } else {
+      // print("El índice de fila especificado está fuera de rango.");
+    }
+  }
 
   //hombre 1, mujer 0
 
@@ -196,32 +232,53 @@ class _NuevaScreenState extends State<NuevaScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     ed = edad.text;
-                    listEdad.add(ed);
-                    listSexo.add(sexo);
-                    print(procedimiento);
-                    print(diagnostico);
+
+                    if (listEdad.length <= 1 && listSexo.length <= 1) {
+                      if (ed != '' && sexo != '') {
+                        listEdad.add(ed);
+                        listSexo.add(sexo);
+                      }
+                    }
+
+                    // print("sexo $listSexo");
+                    // print("edad $listEdad");
                     //Añadir espacios en blanco a diagnostico y procedimiento
                     //concatenar listas
                     //enviar la lista a funcion predecir
-
                     //enviar valor de predecir a traducir
                     //resultado de traducir mostrar en pantalla EN UN BOX
+                    //!funciona solo si no es nulo
+                    if (diagnostico != null) {
+                      primerDiagnostico = diagnostico[0];
+                      listPrimerDiagnostico.add(primerDiagnostico);
+                      for (int i = 0; diagnostico.length < 35; i++) {
+                        diagnostico.add('');
+                      }
+                    }
+                    if (procedimiento != null) {
+                      for (int i = 0; procedimiento.length < 30; i++) {
+                        procedimiento.add('');
+                      }
+                    }
 
-                    // for (int i = 0; listDiagnosticos.length < 35; i++) {
-                    //   listDiagnosticos.add('');
-                    // }
+                    print("diag $diagnostico");
+                    print("proc $procedimiento");
+                    print("primer $primerDiagnostico");
                     //concatenar listas
-                    // combinacionInput = [
-                    //   ...listDiagnosticos,
-                    //   ...listProcedimientos,
-                    //   ...listSexo,
-                    //   ...listEdad
-                    // ];
-                    // print(combinacionInput);
+                    if (diagnostico != null && procedimiento != null) {
+                      var combinacionInput = [
+                        ...diagnostico,
+                        ...procedimiento,
+                        ...listPrimerDiagnostico,
+                        ...listSexo,
+                        ...listEdad
+                      ];
+                      print(combinacionInput);
+                    }
                     // interpreter.run(input, output);
                     // print(output);
-                    //!ENVIAR SOLO UN DATO A LA FUNCION PREDECIR
-                    predecirDatos(diagnostico, procedimiento);
+                    //!ENVIAR SOLO UN DATO A LA FUNCION PREDECIR (combinacionInput)
+                    predecirDatos(combinacionInput);
                   },
                   child: const Text('Predecir'),
                 ),
@@ -244,9 +301,9 @@ class _NuevaScreenState extends State<NuevaScreen> {
                   ],
                 ),
                 child: Text(
-                  probabilidad, // *'Probabilidad : $probabilidad',y el GRD obtenido y descripcion
+                  listaFinal, // *'Probabilidad : $probabilidad',y el GRD obtenido y descripcion
                   style: const TextStyle(
-                      fontSize: 24.0), // Tamaño de texto más grande
+                      fontSize: 15.0), // Tamaño de texto más grande
                 ),
               ),
             ]),
@@ -291,34 +348,5 @@ class InputEdad extends StatelessWidget {
         hintText: 'Edad',
       ),
     );
-  }
-}
-
-void traducir(output) async {
-  final datosCSV = await rootBundle.loadString('assets/grdsOutput.csv');
-  final filaEspecifica = (output);
-
-  List<List<dynamic>> csvTabla = const CsvToListConverter().convert(datosCSV);
-
-  //buscador de fila entregada por el output del modelo para que la muestre al usuario con GRD y Descripcion
-  if (filaEspecifica >= 0 && filaEspecifica < csvTabla.length) {
-    List<dynamic> filaGuardada = csvTabla[filaEspecifica];
-    print("Fila $filaEspecifica: $filaGuardada"); // Imprime la fila específica
-
-    String valorColumna1 = filaGuardada[0]
-        .toString(); // Suponiendo que el valor se encuentra en la primera columna
-    List<String> valoresSeparados = valorColumna1.split(';');
-
-    if (valoresSeparados.length >= 2) {
-      String codigoGRD = valoresSeparados[1];
-      String descripcionGRD = valoresSeparados[2];
-
-      print("El GRD predecido es $codigoGRD");
-      print("Otra variable: $descripcionGRD");
-    } else {
-      print("No se encontraron valores separados en la columna 1.");
-    }
-  } else {
-    print("El índice de fila especificado está fuera de rango.");
   }
 }
