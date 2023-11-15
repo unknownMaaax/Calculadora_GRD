@@ -1,6 +1,9 @@
+import 'package:app_grd/main.dart';
 import 'package:app_grd/widgets/diagnostico_text.dart';
+import 'package:app_grd/widgets/edad_text.dart';
 import 'package:app_grd/widgets/model.dart';
 import 'package:app_grd/widgets/procedimiento_text.dart';
+import 'package:app_grd/widgets/sexo_radiobutton.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,17 +19,23 @@ class NuevaScreen extends StatefulWidget {
 
 class _NuevaScreenState extends State<NuevaScreen> {
   double ed = 0.0;
-  double sexo = 0.0;
+  // double sexo = 0.0;
   String listaFinal = '';
   List<double> listSexo = [];
   List<double> listEdad = [];
+  List<num> listDiagnosticos = [];
+  List<num> listProcedimientos = [];
   var listPrimerDiagnostico = [];
   num primerDiagnostico = 0.0;
   String probabilidad = '';
   String codigoGRD = '';
   String descripcionGRD = '';
-
   final edad = TextEditingController();
+
+  // bool _valueHombre = false;
+  // bool _valueMujer = false;
+
+  double? procedimiento;
 
   Future<void> predecirDatos(input) async {
     // Tu código aquí
@@ -147,34 +156,48 @@ class _NuevaScreenState extends State<NuevaScreen> {
       if (valoresSeparados.length >= 2) {
         setState(() {
           codigoGRD = valoresSeparados[1];
-          descripcionGRD = valoresSeparados[2];
+          // descripcionGRD = valoresSeparados[2];
           listaFinal =
-              'Se predijo el GRD: $codigoGRD,\n $descripcionGRD \n probabilidad de $probabilidadGRD';
+              'Se predijo el GRD: $codigoGRD,\n $descripcionGRD \n Precisión de: $probabilidadGRD';
         });
 
         print("El GRD predecido es $codigoGRD");
-        print("Otra variable: $descripcionGRD");
-      } else {
-        // print("No se encontraron valores separados en la columna 1.");
+        // print("Otra variable: $descripcionGRD");
       }
-    } else {
-      // print("El índice de fila especificado está fuera de rango.");
     }
   }
 
-  //hombre 1, mujer 0
-
-  bool _valueHombre = false;
-  bool _valueMujer = false;
+  //hombre 0, mujer 1
+  void reiniciarVariablesLocales() {
+    setState(() {
+      ed = 0.0;
+      // sexo = 0.0;
+      listaFinal = '';
+      listSexo = [];
+      listEdad = [];
+      listPrimerDiagnostico = [];
+      primerDiagnostico = 0.0;
+      probabilidad = '';
+      codigoGRD = '';
+      descripcionGRD = '';
+      // _valueHombre = false;
+      // _valueMujer = false;
+    });
+  }
 
   List combinacionInput = [];
 
   @override
   Widget build(BuildContext context) {
-    List<num>? procedimiento =
-        Provider.of<ProcedimientoModel>(context).procedimiento;
     List<num>? diagnostico =
         Provider.of<ProcedimientoModel>(context).diagnostico;
+    List<num>? procedimiento =
+        Provider.of<ProcedimientoModel>(context).procedimiento;
+    double? sexo = Provider.of<ProcedimientoModel>(context).sexo;
+    double? edad = Provider.of<ProcedimientoModel>(context).edad;
+    // List<double> listaCodigosProcedimiento =
+    //     Provider.of<ProcedimientoModel>(context).listaCodigosProcedimiento;
+
     return Scaffold(
       body: ListView(
         children: [
@@ -201,48 +224,21 @@ class _NuevaScreenState extends State<NuevaScreen> {
               ),
               const ProcedimientoDropdown(),
               const SizedBox(height: 5),
-              CheckboxListTile(
-                title: const Text('Hombre'),
-                value: _valueHombre,
-                onChanged: (value) {
-                  setState(() {
-                    _valueHombre = value!;
-                    _valueMujer = false;
-                    sexo = value ? 1.0 : 0.0;
-                  });
-                },
-              ),
-              CheckboxListTile(
-                title: const Text('Mujer'),
-                value: _valueMujer,
-                onChanged: (value) {
-                  setState(() {
-                    _valueMujer = value!;
-                    _valueHombre = false;
-                    sexo = value ? 0.0 : 1.0;
-                  });
-                },
-              ),
-              InputEdad(edad: edad),
+              const SexoButtonState(),
+              const SizedBox(height: 5),
+              const InputEdad(),
               const SizedBox(height: 5),
               Container(
                 // padding: const EdgeInsets.all(25),
                 alignment: Alignment.center,
                 child: ElevatedButton(
                   onPressed: () async {
-                    double? temp = double.tryParse(edad.text);
+                    double? temp = edad;
                     if (temp != null) {
                       ed = temp;
                     } else {
                       ed = 0.0;
                     }
-
-                    // if (listEdad.length < 1 && listSexo.length < 1) {
-                    //   if (ed != '' && sexo != '') {
-                    //     listEdad.add(ed);
-                    //     listSexo.add(sexo);
-                    //   }
-                    // }
                     if (ed != null) {
                       listEdad.clear();
                       listEdad.add(ed);
@@ -251,14 +247,6 @@ class _NuevaScreenState extends State<NuevaScreen> {
                       listSexo.clear();
                       listSexo.add(sexo);
                     }
-
-                    // print("sexo $listSexo");
-                    // print("edad $listEdad");
-                    //Añadir espacios en blanco a diagnostico y procedimiento
-                    //concatenar listas
-                    //enviar la lista a funcion predecir
-                    //enviar valor de predecir a traducir
-                    //resultado de traducir mostrar en pantalla EN UN BOX
                     //!funciona solo si no es nulo
                     if (diagnostico != null && diagnostico.length <= 34) {
                       if (diagnostico[0] >= 1.0) {
@@ -275,12 +263,13 @@ class _NuevaScreenState extends State<NuevaScreen> {
                       }
                     }
 
-                    print("diag $diagnostico");
-                    print("proc $procedimiento");
+                    print("diag $listDiagnosticos");
+                    print("proc $listProcedimientos");
                     print("primer $primerDiagnostico");
                     //concatenar listas
                     if (diagnostico != null && procedimiento != null) {
                       print("entro");
+
                       List<num> combinacionInput = [
                         ...diagnostico,
                         ...procedimiento,
@@ -292,8 +281,8 @@ class _NuevaScreenState extends State<NuevaScreen> {
                       print("aaaa $combinacionInput");
                       predecirDatos(combinacionInput);
                     }
-                    // interpreter.run(input, output);
-                    // print(output);
+                    print(listEdad);
+                    print(listSexo);
 
                     //!ENVIAR SOLO UN DATO A LA FUNCION PREDECIR (combinacionInput)
                   },
@@ -302,27 +291,51 @@ class _NuevaScreenState extends State<NuevaScreen> {
               ),
               const SizedBox(height: 5),
               Container(
-                width: MediaQuery.of(context).size.width *
-                    0.9, // 90% del ancho de la pantalla
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 2,
-                      offset: const Offset(0, 2),
+                  width: MediaQuery.of(context).size.width *
+                      0.9, // 90% del ancho de la pantalla
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 2,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(children: [
+                    const Text(
+                      'Prediccion GRD:',
+                      style: TextStyle(
+                          fontSize: 20.0, fontWeight: FontWeight.bold),
                     ),
-                  ],
-                ),
-                child: Text(
-                  listaFinal, // *'Probabilidad : $probabilidad',y el GRD obtenido y descripcion
-                  style: const TextStyle(
-                      fontSize: 15.0), // Tamaño de texto más grande
-                ),
-              ),
+                    Text(
+                      listaFinal, // *'Probabilidad : $probabilidad',y el GRD obtenido y descripcion
+                      style: const TextStyle(
+                          fontSize: 15.0), // Tamaño de texto más grande
+                    ),
+                  ])),
+              const SizedBox(height: 5),
+              ElevatedButton(
+                onPressed: () {
+                  // Provider.of<ProcedimientoModel>(context, listen: false)
+                  //     .reiniciarVariablesProvider();
+                  // reiniciarVariablesLocales();
+                  // listDiagnosticos.clear();
+                  // listProcedimientos.clear();
+                  // listSexo.clear();
+                  // listEdad.clear();
+                  // print("presionado");
+                  // print(listDiagnosticos);
+                  // print(listProcedimientos);
+                  // print(listSexo);
+                  // print(listEdad);
+                },
+                child: const Text('Reiniciar'),
+              )
             ]),
           )
           //DropdownDiagnostico(),
@@ -343,29 +356,6 @@ class _NuevaScreenState extends State<NuevaScreen> {
       ),
       centerTitle: true,
       elevation: 1.0,
-    );
-  }
-}
-
-//textfield edad
-class InputEdad extends StatelessWidget {
-  const InputEdad({
-    super.key,
-    required this.edad,
-  });
-
-  final TextEditingController edad;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: edad,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        hintText: 'Edad',
-      ),
     );
   }
 }

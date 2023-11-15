@@ -1,17 +1,10 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:app_grd/widgets/model.dart';
 import 'package:csv/csv.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
-String itemSelected = '';
-String diagnostico = '';
-List<String> listDiagnosticos = [];
-String codigo = '';
-List<double> listaCodigos = [];
 
 class DiagnosticoDropdown extends StatefulWidget {
   const DiagnosticoDropdown({super.key});
@@ -21,6 +14,26 @@ class DiagnosticoDropdown extends StatefulWidget {
 }
 
 class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
+  String itemSelected = '';
+  String diagnostico = '';
+  List<String> listDiagnosticos = [];
+  String codigo = '';
+  List<double> listaCodigos = [];
+  double? codigoDiag;
+
+  void reiniciarVariables() {
+    setState(() {
+      itemSelected = '';
+      diagnostico = '';
+      listDiagnosticos = [];
+      codigo = '';
+      listaCodigos = [];
+      codigoDiag = null;
+      // Reinicia todas las otras variables aquí
+    });
+    print("reinicio diag");
+  }
+
   void _loadCsv() async {
     String data = await rootBundle.loadString("assets/nuevoDiagnostico.csv");
     List<List<dynamic>> csvTable = const CsvToListConverter().convert(data);
@@ -42,7 +55,6 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
       List<String> lines = LineSplitter.split(csvString).toList();
       String targetValue = diagnostico;
       String? resultRow;
-      print("Función $diagnostico");
 
       for (var row in lines) {
         final values = row.split(';');
@@ -53,12 +65,9 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
         }
       }
       if (resultRow != null) {
-        print('Fila encontrada: $resultRow');
-
         // Ahora puedes separar los datos usando el punto y coma
         List<String> datos = resultRow.split(';');
         codigo = datos[0];
-        print('Código: $codigo');
         // Agrega más líneas según sea necesario para procesar los datos.
       } else {
         // print('No se encontró la fila con el procedimiento deseado.');
@@ -100,22 +109,24 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
         onPressed: () async {
           diagnostico = itemSelected;
           //*traducimos el codigo de diagnostico
-          double? codigoDiag = (await buscarDiagnostico(diagnostico));
+          codigoDiag = (await buscarDiagnostico(diagnostico));
           if (listDiagnosticos.length != 35 &&
               codigoDiag != null &&
               diagnostico != '') {
-            listaCodigos.add(codigoDiag);
+            listaCodigos.add(codigoDiag!);
             print(listaCodigos);
           }
 
           ///*enviar datos a ScreenPrueba para funcion de predecir
           Provider.of<ProcedimientoModel>(context, listen: false)
               .setDiagnostico(listaCodigos);
+
           itemSelected = '';
+
           //!rellenar la lista de diagnosticos a 35 elementos en pantalla inicia
         },
         child: const Text('Agregar'),
-      )
+      ),
     ]);
   }
 }

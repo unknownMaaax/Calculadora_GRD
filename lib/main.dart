@@ -13,16 +13,22 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  static final GlobalKey<_MyAppState> appKey = GlobalKey<_MyAppState>();
+
   const MyApp({super.key});
 
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Calculadora de GRD',
       debugShowCheckedModeBanner: false,
       theme: AppTheme().theme(),
-      // home: const CalculadoraScreen(),
       home: const NuevaScreen(),
     );
   }
