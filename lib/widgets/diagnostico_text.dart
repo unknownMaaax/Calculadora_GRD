@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:app_grd/widgets/model.dart';
 import 'package:csv/csv.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -10,7 +11,7 @@ String itemSelected = '';
 String diagnostico = '';
 List<String> listDiagnosticos = [];
 String codigo = '';
-List<String> listaCodigos = [];
+List<double> listaCodigos = [];
 
 class DiagnosticoDropdown extends StatefulWidget {
   const DiagnosticoDropdown({super.key});
@@ -35,7 +36,7 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
     listDiagnosticos = _data;
   }
 
-  Future<String?> buscarDiagnostico(String diagnostico) async {
+  Future<double?> buscarDiagnostico(String diagnostico) async {
     try {
       String csvString = await rootBundle.loadString('assets/diag.csv');
       List<String> lines = LineSplitter.split(csvString).toList();
@@ -65,7 +66,7 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
     } catch (e) {
       // print('Error al leer el archivo: $e');
     }
-    return codigo;
+    return double.parse(codigo);
   }
 
   @override
@@ -82,6 +83,16 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
         popupProps: const PopupProps.menu(
           showSearchBox: true,
         ),
+        dropdownButtonProps: const DropdownButtonProps(
+          color: Colors.blue,
+        ),
+        dropdownDecoratorProps: DropDownDecoratorProps(
+          textAlignVertical: TextAlignVertical.center,
+          dropdownSearchDecoration: InputDecoration(
+              border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+          )),
+        ),
         selectedItem: itemSelected,
       ),
       const SizedBox(height: 5),
@@ -89,7 +100,7 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
         onPressed: () async {
           diagnostico = itemSelected;
           //*traducimos el codigo de diagnostico
-          String? codigoDiag = await buscarDiagnostico(diagnostico);
+          double? codigoDiag = (await buscarDiagnostico(diagnostico));
           if (listDiagnosticos.length != 35 &&
               codigoDiag != null &&
               diagnostico != '') {

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:app_grd/widgets/diagnostico_text.dart';
 import 'package:app_grd/widgets/model.dart';
 import 'package:app_grd/widgets/procedimiento_text.dart';
@@ -15,19 +17,17 @@ class NuevaScreen extends StatefulWidget {
 }
 
 class _NuevaScreenState extends State<NuevaScreen> {
-  String ed = '';
-  String sexo = '';
+  double ed = 0.0;
+  double sexo = 0.0;
   String listaFinal = '';
-  var listSexo = [];
-  var listEdad = [];
+  List<double> listSexo = [];
+  List<double> listEdad = [];
   var listPrimerDiagnostico = [];
-  String primerDiagnostico = '';
+  num primerDiagnostico = 0.0;
   String probabilidad = '';
   String codigoGRD = '';
   String descripcionGRD = '';
-  final diagnostico = TextEditingController();
-  final procedimiento = TextEditingController();
-  // final sexo = TextEditingController();
+
   final edad = TextEditingController();
 
   Future<void> predecirDatos(input) async {
@@ -35,11 +35,12 @@ class _NuevaScreenState extends State<NuevaScreen> {
     final interpreter = await Interpreter.fromAsset(
         'assets/model_satt_sn20231017-211500/convert.tflite');
 
-    var input2 = interpreter.getInputTensor(0);
+    var inputShape = interpreter.getInputTensor(0);
+
     var input3 = [
-      1010.0,
+      1010,
       877.0,
-      529.0,
+      529,
       3595.0,
       0.0,
       0.0,
@@ -106,13 +107,13 @@ class _NuevaScreenState extends State<NuevaScreen> {
       65.0,
       0.0,
     ];
-    input2.setTo(input3);
-    // print(input2);
+
+    inputShape.setTo(input);
 
     var outputList = List.filled(1 * 210, 0.0);
     var output = [outputList];
 
-    interpreter.run(input2.data, output);
+    interpreter.run(inputShape.data, output);
 
     double maximo = output.first
         .reduce((value, element) => value > element ? value : element);
@@ -153,8 +154,8 @@ class _NuevaScreenState extends State<NuevaScreen> {
               'Se predijo el GRD: $codigoGRD,\n $descripcionGRD \n probabilidad de $probabilidadGRD';
         });
 
-        // print("El GRD predecido es $codigoGRD");
-        // print("Otra variable: $descripcionGRD");
+        print("El GRD predecido es $codigoGRD");
+        print("Otra variable: $descripcionGRD");
       } else {
         // print("No se encontraron valores separados en la columna 1.");
       }
@@ -172,9 +173,9 @@ class _NuevaScreenState extends State<NuevaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<String>? procedimiento =
+    List<num>? procedimiento =
         Provider.of<ProcedimientoModel>(context).procedimiento;
-    List<String>? diagnostico =
+    List<num>? diagnostico =
         Provider.of<ProcedimientoModel>(context).diagnostico;
     return Scaffold(
       body: ListView(
@@ -209,7 +210,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
                   setState(() {
                     _valueHombre = value!;
                     _valueMujer = false;
-                    sexo = value ? '1' : '';
+                    sexo = value ? 1.0 : 0.0;
                   });
                 },
               ),
@@ -220,7 +221,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
                   setState(() {
                     _valueMujer = value!;
                     _valueHombre = false;
-                    sexo = value ? '0' : '';
+                    sexo = value ? 0.0 : 1.0;
                   });
                 },
               ),
@@ -231,13 +232,26 @@ class _NuevaScreenState extends State<NuevaScreen> {
                 alignment: Alignment.center,
                 child: ElevatedButton(
                   onPressed: () async {
-                    ed = edad.text;
+                    double? temp = double.tryParse(edad.text);
+                    if (temp != null) {
+                      ed = temp;
+                    } else {
+                      ed = 0.0;
+                    }
 
-                    if (listEdad.length <= 1 && listSexo.length <= 1) {
-                      if (ed != '' && sexo != '') {
-                        listEdad.add(ed);
-                        listSexo.add(sexo);
-                      }
+                    // if (listEdad.length < 1 && listSexo.length < 1) {
+                    //   if (ed != '' && sexo != '') {
+                    //     listEdad.add(ed);
+                    //     listSexo.add(sexo);
+                    //   }
+                    // }
+                    if (ed != null) {
+                      listEdad.clear();
+                      listEdad.add(ed);
+                    }
+                    if (sexo != null) {
+                      listSexo.clear();
+                      listSexo.add(sexo);
                     }
 
                     // print("sexo $listSexo");
@@ -248,16 +262,18 @@ class _NuevaScreenState extends State<NuevaScreen> {
                     //enviar valor de predecir a traducir
                     //resultado de traducir mostrar en pantalla EN UN BOX
                     //!funciona solo si no es nulo
-                    if (diagnostico != null) {
-                      primerDiagnostico = diagnostico[0];
-                      listPrimerDiagnostico.add(primerDiagnostico);
-                      for (int i = 0; diagnostico.length < 35; i++) {
-                        diagnostico.add('');
+                    if (diagnostico != null && diagnostico.length <= 34) {
+                      if (diagnostico[0] >= 1.0) {
+                        primerDiagnostico = diagnostico[0];
+                        listPrimerDiagnostico.add(primerDiagnostico);
+                      }
+                      for (int i = 0; diagnostico.length <= 34; i++) {
+                        diagnostico.add(0.0);
                       }
                     }
-                    if (procedimiento != null) {
-                      for (int i = 0; procedimiento.length < 30; i++) {
-                        procedimiento.add('');
+                    if (procedimiento != null && procedimiento.length <= 29) {
+                      for (int i = 0; procedimiento.length <= 29; i++) {
+                        procedimiento.add(0.0);
                       }
                     }
 
@@ -266,19 +282,22 @@ class _NuevaScreenState extends State<NuevaScreen> {
                     print("primer $primerDiagnostico");
                     //concatenar listas
                     if (diagnostico != null && procedimiento != null) {
-                      var combinacionInput = [
+                      print("entro");
+                      List<num> combinacionInput = [
                         ...diagnostico,
                         ...procedimiento,
                         ...listPrimerDiagnostico,
-                        ...listSexo,
-                        ...listEdad
+                        ...listEdad,
+                        ...listSexo
                       ];
-                      print(combinacionInput);
+                      print(combinacionInput.length);
+                      print("aaaa $combinacionInput");
+                      predecirDatos(combinacionInput);
                     }
                     // interpreter.run(input, output);
                     // print(output);
+
                     //!ENVIAR SOLO UN DATO A LA FUNCION PREDECIR (combinacionInput)
-                    predecirDatos(combinacionInput);
                   },
                   child: const Text('Predecir'),
                 ),
@@ -343,8 +362,10 @@ class InputEdad extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: edad,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
         hintText: 'Edad',
       ),
     );

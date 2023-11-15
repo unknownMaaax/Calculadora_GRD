@@ -1,20 +1,22 @@
 // procedimiento_model.dart
 
+import 'dart:ffi';
+
 import 'package:flutter/foundation.dart';
 
 class ProcedimientoModel extends ChangeNotifier {
-  List<String>? _procedimiento;
-  List<String>? _diagnostico;
+  List<num>? _procedimiento;
+  List<num>? _diagnostico;
 
-  List<String>? get procedimiento => _procedimiento;
-  List<String>? get diagnostico => _diagnostico;
+  List<num>? get procedimiento => _procedimiento;
+  List<num>? get diagnostico => _diagnostico;
 
-  void setProcedimiento(List<String> listaCodigosProcedimiento) {
+  void setProcedimiento(List<num> listaCodigosProcedimiento) {
     _procedimiento = listaCodigosProcedimiento;
     notifyListeners();
   }
 
-  void setDiagnostico(List<String> listaCodigos) {
+  void setDiagnostico(List<num> listaCodigos) {
     _diagnostico = listaCodigos;
     notifyListeners();
   }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:app_grd/widgets/model.dart';
 import 'package:csv/csv.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -10,8 +11,8 @@ String itemSelected = '';
 String procedimiento = '';
 String procedimientoTraducido = '';
 List<String> listProcedimientos = [];
-int codigo = 0;
-List<String> listaCodigosProcedimiento = [];
+double codigo = 0;
+List<double> listaCodigosProcedimiento = [];
 
 class ProcedimientoDropdown extends StatefulWidget {
   const ProcedimientoDropdown({super.key});
@@ -37,7 +38,7 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
     // print(listProcedimientos[1]);
   }
 
-  Future<String?> buscarProcedimiento(String procedimientoFunc) async {
+  Future<double?> buscarProcedimiento(String procedimientoFunc) async {
     try {
       String csvString = await rootBundle.loadString('assets/proc.csv');
       List<String> lines = LineSplitter.split(csvString).toList();
@@ -58,8 +59,16 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
         // Ahora puedes separar los datos usando el punto y coma
         List<String> datos = resultRow.split(';');
 
-        codigo = (int.parse(datos[0]) + 3648);
-        print('Código: $codigo');
+        double? temp = double.tryParse(datos[0]);
+        print(temp);
+        if (temp != null) {
+          codigo = temp + 3648.0;
+          print(codigo);
+        } else {
+          // Maneja el caso en que datos[0] no sea un número válido
+          // Por ejemplo, puedes establecer codigo a un valor predeterminado
+          codigo = 3648.0;
+        }
         // Agrega más líneas según sea necesario para procesar los datos.
       } else {
         // print('No se encontró la fila con el procedimiento deseado.');
@@ -67,7 +76,7 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
     } catch (e) {
       // print('Error al leer el archivo: $e');
     }
-    return codigo.toString();
+    return codigo;
   }
 
   @override
@@ -84,21 +93,31 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
         popupProps: const PopupProps.menu(
           showSearchBox: true,
         ),
+        dropdownButtonProps: const DropdownButtonProps(
+          color: Colors.blue,
+        ),
+        dropdownDecoratorProps: DropDownDecoratorProps(
+          textAlignVertical: TextAlignVertical.center,
+          dropdownSearchDecoration: InputDecoration(
+              border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+          )),
+        ),
         selectedItem: itemSelected,
       ),
       const SizedBox(height: 5),
       ElevatedButton(
         onPressed: () async {
           procedimiento = itemSelected;
-          String? codigoProc = await buscarProcedimiento(procedimiento);
+          double? codigoProc = await buscarProcedimiento(procedimiento);
           if (listaCodigosProcedimiento.length != 35 &&
               codigoProc != null &&
               procedimiento != '') {
-            listaCodigosProcedimiento.add(codigoProc);
+            listaCodigosProcedimiento.add(codigoProc as double);
           }
           //*enviar datos a ScreenPrueba para funcion de predecir
           Provider.of<ProcedimientoModel>(context, listen: false)
-              .setProcedimiento(listaCodigosProcedimiento);
+              .setProcedimiento(listaCodigosProcedimiento.cast<double>());
           itemSelected = '';
           //!rellenar la lista de diagnosticos a 35 elementos en pantalla incial
         },
