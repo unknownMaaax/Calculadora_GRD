@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:app_grd/widgets/diagnostico_text.dart';
 import 'package:app_grd/widgets/model.dart';
 import 'package:app_grd/widgets/procedimiento_text.dart';
