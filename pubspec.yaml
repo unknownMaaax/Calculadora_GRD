@@ -71,10 +71,12 @@ flutter:
       
       - assets/model_satt_sn20231017-211500/convert.tflite
       - assets/grdsOutput.csv
+      - assets/grdsOutput2.csv
       - assets/diag.csv
       - assets/proc.csv
       - assets/nuevoProcedimiento.csv
       - assets/nuevoDiagnostico.csv
+      - assets/grd.png
 
 
 

@@ -139,7 +139,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
   }
 
   void traducir(output, probabilidadGRD) async {
-    final datosCSV = await rootBundle.loadString('assets/grdsOutput.csv');
+    final datosCSV = await rootBundle.loadString('assets/grdsOutput2.csv');
     final filaEspecifica = (output);
 
     List<List<dynamic>> csvTabla = const CsvToListConverter().convert(datosCSV);
@@ -157,13 +157,13 @@ class _NuevaScreenState extends State<NuevaScreen> {
       if (valoresSeparados.length >= 2) {
         setState(() {
           codigoGRD = valoresSeparados[1];
-          // descripcionGRD = valoresSeparados[2];
+          descripcionGRD = valoresSeparados[2];
           listaFinal =
-              'Se predijo el GRD: $codigoGRD,\n $descripcionGRD \nPrecisión de: $probabilidadGRD';
+              'GRD predecido: $codigoGRD,\nDetalle:$descripcionGRD \nPrecisión de: $probabilidadGRD';
         });
 
         print("El GRD predecido es $codigoGRD");
-        // print("Otra variable: $descripcionGRD");
+        print("Otra variable: $descripcionGRD");
       }
     }
   }
@@ -386,17 +386,17 @@ class _NuevaScreenState extends State<NuevaScreen> {
 
   AppBar appBar() {
     return AppBar(
-      title: const Text(
-        'Calculadora GRD',
-        style: TextStyle(
-          color: Color.fromARGB(255, 0, 0, 0),
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+        title: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Image.asset(
+          'assets/grd.png',
+          fit: BoxFit.contain,
+          height: 50,
         ),
-      ),
-      centerTitle: true,
-      elevation: 1.0,
-    );
+        // >
+      ],
+    ));
   }
 }
 
