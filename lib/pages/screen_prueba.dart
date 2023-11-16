@@ -21,8 +21,8 @@ class _NuevaScreenState extends State<NuevaScreen> {
   double ed = 0.0;
   // double sexo = 0.0;
   String listaFinal = '';
-  List<double> listSexo = [];
-  List<double> listEdad = [];
+  List<num> listSexo = [];
+  List<num> listEdad = [];
   List<num> listDiagnosticos = [];
   List<num> listProcedimientos = [];
   var listPrimerDiagnostico = [];
@@ -135,6 +135,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
     //traduccion de lista grd
     //mostrar probabilidad
     traducir(elemento, probabilidad);
+    interpreter.close();
   }
 
   void traducir(output, probabilidadGRD) async {
@@ -158,7 +159,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
           codigoGRD = valoresSeparados[1];
           // descripcionGRD = valoresSeparados[2];
           listaFinal =
-              'Se predijo el GRD: $codigoGRD,\n $descripcionGRD \n Precisión de: $probabilidadGRD';
+              'Se predijo el GRD: $codigoGRD,\n $descripcionGRD \nPrecisión de: $probabilidadGRD';
         });
 
         print("El GRD predecido es $codigoGRD");
@@ -245,7 +246,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
                     }
                     if (sexo != null) {
                       listSexo.clear();
-                      listSexo.add(sexo);
+                      listSexo.add(sexo as num);
                     }
                     //!funciona solo si no es nulo
                     if (diagnostico != null && diagnostico.length <= 34) {
@@ -281,8 +282,9 @@ class _NuevaScreenState extends State<NuevaScreen> {
                       print("aaaa $combinacionInput");
                       predecirDatos(combinacionInput);
                     }
+
                     print(listEdad);
-                    print(listSexo);
+                    print("sexo: $listSexo");
 
                     //!ENVIAR SOLO UN DATO A LA FUNCION PREDECIR (combinacionInput)
                   },
@@ -321,18 +323,33 @@ class _NuevaScreenState extends State<NuevaScreen> {
               const SizedBox(height: 5),
               ElevatedButton(
                 onPressed: () {
-                  // Provider.of<ProcedimientoModel>(context, listen: false)
-                  //     .reiniciarVariablesProvider();
-                  // reiniciarVariablesLocales();
-                  // listDiagnosticos.clear();
-                  // listProcedimientos.clear();
-                  // listSexo.clear();
-                  // listEdad.clear();
-                  // print("presionado");
-                  // print(listDiagnosticos);
-                  // print(listProcedimientos);
-                  // print(listSexo);
-                  // print(listEdad);
+                  Provider.of<ProcedimientoModel>(context, listen: false)
+                      .reset();
+                  listDiagnosticos.clear();
+                  listProcedimientos.clear();
+                  procedimiento?.clear();
+                  diagnostico?.clear();
+                  listSexo.clear();
+                  listEdad.clear();
+
+                  edad = null;
+                  setState(() {
+                    listaFinal = '';
+                  });
+                  combinacionInput.clear();
+                  primerDiagnostico = 0.0;
+                  listPrimerDiagnostico.clear();
+
+                  print("presionado");
+                  print("1: $listDiagnosticos");
+                  print("2: $listProcedimientos");
+                  print("1.a: $diagnostico");
+                  print("2.a: $procedimiento");
+                  print("3: $listSexo");
+                  print("4: $listEdad");
+                  print("5: $combinacionInput");
+                  print("6: $primerDiagnostico");
+                  print("7: $listPrimerDiagnostico");
                 },
                 child: const Text('Reiniciar'),
               )

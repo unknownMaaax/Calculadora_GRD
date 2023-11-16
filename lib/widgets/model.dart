@@ -19,11 +19,22 @@ class ProcedimientoModel extends ChangeNotifier {
 
   double? _sexo;
   double? _edad;
-  final List<double> _listaCodigosProcedimiento = [];
+  String? edadreset;
+  List<double> listaCodigos = [];
+  List<double> listaCodigosProcedimiento = [];
+  // bool _valueHombre = false;
+  // bool _valueMujer = false;
 
   double? get sexo => _sexo;
   double? get edad => _edad;
-  List<double> get listaCodigosProcedimiento => _listaCodigosProcedimiento;
+
+  void reset() {
+    listaCodigos = [];
+    listaCodigosProcedimiento = [];
+    edadreset = '';
+    // _valueHombre = false;
+    // _valueMujer = false;
+  }
 
   void setSexo(double? sexoCodigos) {
     _sexo = sexoCodigos;
@@ -38,7 +49,6 @@ class ProcedimientoModel extends ChangeNotifier {
   void reiniciarVariablesProvider() {
     _procedimiento = null;
     _diagnostico = null;
-    listaCodigosProcedimiento.clear();
     print(diagnostico);
     print(procedimiento);
     notifyListeners();

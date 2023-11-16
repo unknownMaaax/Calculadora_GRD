@@ -15,6 +15,7 @@ class _InputEdadState extends State<InputEdad> {
   // late final TextEditingController edad;
   @override
   Widget build(BuildContext context) {
+    // final procedimientoModel = Provider.of<ProcedimientoModel>(context);
     return TextField(
       onSubmitted: (value) {
         double edad = double.parse(value);

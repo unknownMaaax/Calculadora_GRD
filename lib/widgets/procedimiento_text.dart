@@ -82,6 +82,10 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
   @override
   Widget build(BuildContext context) {
     _loadCsv();
+    final procedimientoModel = Provider.of<ProcedimientoModel>(context);
+    // Ahora puedes usar listaCodigos
+    List<double> listaCodigosProcedimiento =
+        procedimientoModel.listaCodigosProcedimiento;
     return ChangeNotifierProvider(
         create: (context) => ProcedimientoModel(),
         child: Column(children: [
@@ -116,6 +120,7 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
                   codigoProc != null &&
                   procedimiento != '') {
                 listaCodigosProcedimiento.add(codigoProc as double);
+                print(listaCodigosProcedimiento);
               }
               //*enviar datos a ScreenPrueba para funcion de predecir
               Provider.of<ProcedimientoModel>(context, listen: false)

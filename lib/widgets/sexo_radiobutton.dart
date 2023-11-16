@@ -15,6 +15,8 @@ class _SexoButtonStateState extends State<SexoButtonState> {
   double sexo = 0.0;
   @override
   Widget build(BuildContext context) {
+    final procedimientoModel = Provider.of<ProcedimientoModel>(context);
+
     return Column(
       children: [
         CheckboxListTile(

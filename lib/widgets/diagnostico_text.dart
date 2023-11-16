@@ -18,7 +18,7 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
   String diagnostico = '';
   List<String> listDiagnosticos = [];
   String codigo = '';
-  List<double> listaCodigos = [];
+  // List<double> listaCodigos = [];
   double? codigoDiag;
 
   void reiniciarVariables() {
@@ -27,7 +27,6 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
       diagnostico = '';
       listDiagnosticos = [];
       codigo = '';
-      listaCodigos = [];
       codigoDiag = null;
       // Reinicia todas las otras variables aquí
     });
@@ -81,6 +80,8 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
   @override
   Widget build(BuildContext context) {
     _loadCsv();
+    final procedimientoModel = Provider.of<ProcedimientoModel>(context);
+    List<double> listaCodigos = procedimientoModel.listaCodigos;
     return Column(children: [
       DropdownSearch<dynamic>(
         items: listDiagnosticos,
