@@ -89,28 +89,31 @@ class _ProcedimientoDropdownState extends State<ProcedimientoDropdown> {
     return ChangeNotifierProvider(
         create: (context) => ProcedimientoModel(),
         child: Column(children: [
-          DropdownSearch<dynamic>(
-            items: listProcedimientos,
-            onChanged: (value) {
-              setState(() {
-                itemSelected = value.toString();
-              });
-            },
-            popupProps: const PopupProps.menu(
-              showSearchBox: true,
-            ),
-            dropdownButtonProps: const DropdownButtonProps(
-              color: Colors.blue,
-            ),
-            dropdownDecoratorProps: DropDownDecoratorProps(
-              textAlignVertical: TextAlignVertical.center,
-              dropdownSearchDecoration: InputDecoration(
-                  border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
+          Material(
+              elevation: 5.0,
+              borderRadius: BorderRadius.circular(15),
+              child: DropdownSearch<dynamic>(
+                items: listProcedimientos,
+                onChanged: (value) {
+                  setState(() {
+                    itemSelected = value.toString();
+                  });
+                },
+                popupProps: const PopupProps.menu(
+                  showSearchBox: true,
+                ),
+                dropdownButtonProps: const DropdownButtonProps(
+                  color: Colors.blue,
+                ),
+                dropdownDecoratorProps: DropDownDecoratorProps(
+                  textAlignVertical: TextAlignVertical.center,
+                  dropdownSearchDecoration: InputDecoration(
+                      border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  )),
+                ),
+                selectedItem: itemSelected,
               )),
-            ),
-            selectedItem: itemSelected,
-          ),
           const SizedBox(height: 5),
           ElevatedButton(
             onPressed: () async {

@@ -83,28 +83,31 @@ class _DiagnosticoDropdownState extends State<DiagnosticoDropdown> {
     final procedimientoModel = Provider.of<ProcedimientoModel>(context);
     List<double> listaCodigos = procedimientoModel.listaCodigos;
     return Column(children: [
-      DropdownSearch<dynamic>(
-        items: listDiagnosticos,
-        onChanged: (value) {
-          setState(() {
-            itemSelected = value.toString();
-          });
-        },
-        popupProps: const PopupProps.menu(
-          showSearchBox: true,
-        ),
-        dropdownButtonProps: const DropdownButtonProps(
-          color: Colors.blue,
-        ),
-        dropdownDecoratorProps: DropDownDecoratorProps(
-          textAlignVertical: TextAlignVertical.center,
-          dropdownSearchDecoration: InputDecoration(
-              border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
+      Material(
+          elevation: 5.0,
+          borderRadius: BorderRadius.circular(15),
+          child: DropdownSearch<dynamic>(
+            items: listDiagnosticos,
+            onChanged: (value) {
+              setState(() {
+                itemSelected = value.toString();
+              });
+            },
+            popupProps: const PopupProps.menu(
+              showSearchBox: true,
+            ),
+            dropdownButtonProps: const DropdownButtonProps(
+              color: Colors.blue,
+            ),
+            dropdownDecoratorProps: DropDownDecoratorProps(
+              textAlignVertical: TextAlignVertical.center,
+              dropdownSearchDecoration: InputDecoration(
+                  border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+              )),
+            ),
+            selectedItem: itemSelected,
           )),
-        ),
-        selectedItem: itemSelected,
-      ),
       const SizedBox(height: 5),
       ElevatedButton(
         onPressed: () async {

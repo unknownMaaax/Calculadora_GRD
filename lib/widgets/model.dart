@@ -22,18 +22,19 @@ class ProcedimientoModel extends ChangeNotifier {
   String? edadreset;
   List<double> listaCodigos = [];
   List<double> listaCodigosProcedimiento = [];
-  // bool _valueHombre = false;
-  // bool _valueMujer = false;
+  bool _valueHombre = false;
+  bool _valueMujer = false;
 
   double? get sexo => _sexo;
   double? get edad => _edad;
+  bool get valueHombre => _valueHombre;
+  bool get valueMujer => _valueMujer;
 
   void reset() {
     listaCodigos = [];
     listaCodigosProcedimiento = [];
     edadreset = '';
-    // _valueHombre = false;
-    // _valueMujer = false;
+    _edad = null;
   }
 
   void setSexo(double? sexoCodigos) {

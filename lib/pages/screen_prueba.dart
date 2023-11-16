@@ -19,7 +19,7 @@ class NuevaScreen extends StatefulWidget {
 
 class _NuevaScreenState extends State<NuevaScreen> {
   double ed = 0.0;
-  // double sexo = 0.0;
+  double sexo = 0.0;
   String listaFinal = '';
   List<num> listSexo = [];
   List<num> listEdad = [];
@@ -32,8 +32,8 @@ class _NuevaScreenState extends State<NuevaScreen> {
   String descripcionGRD = '';
   final edad = TextEditingController();
 
-  // bool _valueHombre = false;
-  // bool _valueMujer = false;
+  bool _valueHombre = false;
+  bool _valueMujer = false;
 
   double? procedimiento;
 
@@ -172,7 +172,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
   void reiniciarVariablesLocales() {
     setState(() {
       ed = 0.0;
-      // sexo = 0.0;
+      sexo = 0.0;
       listaFinal = '';
       listSexo = [];
       listEdad = [];
@@ -181,8 +181,8 @@ class _NuevaScreenState extends State<NuevaScreen> {
       probabilidad = '';
       codigoGRD = '';
       descripcionGRD = '';
-      // _valueHombre = false;
-      // _valueMujer = false;
+      _valueHombre = false;
+      _valueMujer = false;
     });
   }
 
@@ -194,8 +194,8 @@ class _NuevaScreenState extends State<NuevaScreen> {
         Provider.of<ProcedimientoModel>(context).diagnostico;
     List<num>? procedimiento =
         Provider.of<ProcedimientoModel>(context).procedimiento;
-    double? sexo = Provider.of<ProcedimientoModel>(context).sexo;
-    double? edad = Provider.of<ProcedimientoModel>(context).edad;
+    // double? sexo = Provider.of<ProcedimientoModel>(context).sexo;
+    // double? edad = Provider.of<ProcedimientoModel>(context).edad;
     // List<double> listaCodigosProcedimiento =
     //     Provider.of<ProcedimientoModel>(context).listaCodigosProcedimiento;
 
@@ -225,16 +225,38 @@ class _NuevaScreenState extends State<NuevaScreen> {
               ),
               const ProcedimientoDropdown(),
               const SizedBox(height: 5),
-              const SexoButtonState(),
+              // const SexoButtonState(),
+              CheckboxListTile(
+                title: const Text('Hombre'),
+                value: _valueHombre,
+                onChanged: (value) {
+                  setState(() {
+                    _valueHombre = value!;
+                    _valueMujer = false;
+                    sexo = value ? 1.0 : 0.0;
+                  });
+                },
+              ),
+              CheckboxListTile(
+                title: const Text('Mujer'),
+                value: _valueMujer,
+                onChanged: (value) {
+                  setState(() {
+                    _valueMujer = value!;
+                    _valueHombre = false;
+                    sexo = value ? 0.0 : 1.0;
+                  });
+                },
+              ),
               const SizedBox(height: 5),
-              const InputEdad(),
+              InputEdadScreen(edad: edad),
               const SizedBox(height: 5),
               Container(
                 // padding: const EdgeInsets.all(25),
                 alignment: Alignment.center,
                 child: ElevatedButton(
                   onPressed: () async {
-                    double? temp = edad;
+                    double? temp = double.tryParse(edad.text);
                     if (temp != null) {
                       ed = temp;
                     } else {
@@ -292,21 +314,18 @@ class _NuevaScreenState extends State<NuevaScreen> {
                 ),
               ),
               const SizedBox(height: 5),
-              Container(
-                  width: MediaQuery.of(context).size.width *
-                      0.9, // 90% del ancho de la pantalla
+              Material(
+                elevation: 5.0,
+                borderRadius: BorderRadius.circular(15.0),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
                   padding: const EdgeInsets.all(10.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(5.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 2,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    borderRadius: BorderRadius.circular(15.0),
+                    border: Border.all(
+                        color: const Color.fromARGB(255, 23, 23, 23),
+                        width: 0.5),
                   ),
                   child: Column(children: [
                     const Text(
@@ -315,11 +334,12 @@ class _NuevaScreenState extends State<NuevaScreen> {
                           fontSize: 20.0, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      listaFinal, // *'Probabilidad : $probabilidad',y el GRD obtenido y descripcion
-                      style: const TextStyle(
-                          fontSize: 15.0), // Tamaño de texto más grande
+                      listaFinal,
+                      style: const TextStyle(fontSize: 15.0),
                     ),
-                  ])),
+                  ]),
+                ),
+              ),
               const SizedBox(height: 5),
               ElevatedButton(
                 onPressed: () {
@@ -332,13 +352,15 @@ class _NuevaScreenState extends State<NuevaScreen> {
                   listSexo.clear();
                   listEdad.clear();
 
-                  edad = null;
+                  // ed = null;
                   setState(() {
                     listaFinal = '';
                   });
                   combinacionInput.clear();
                   primerDiagnostico = 0.0;
                   listPrimerDiagnostico.clear();
+                  reiniciarVariablesLocales();
+                  edad.clear();
 
                   print("presionado");
                   print("1: $listDiagnosticos");
@@ -350,6 +372,7 @@ class _NuevaScreenState extends State<NuevaScreen> {
                   print("5: $combinacionInput");
                   print("6: $primerDiagnostico");
                   print("7: $listPrimerDiagnostico");
+                  print("8: $edad");
                 },
                 child: const Text('Reiniciar'),
               )
@@ -373,6 +396,33 @@ class _NuevaScreenState extends State<NuevaScreen> {
       ),
       centerTitle: true,
       elevation: 1.0,
+    );
+  }
+}
+
+class InputEdadScreen extends StatelessWidget {
+  const InputEdadScreen({
+    super.key,
+    required this.edad,
+  });
+
+  final TextEditingController edad;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      elevation: 5.0,
+      borderRadius: BorderRadius.circular(15.0),
+      child: TextField(
+        controller: edad,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          hintText: 'Edad',
+        ),
+      ),
     );
   }
 }
