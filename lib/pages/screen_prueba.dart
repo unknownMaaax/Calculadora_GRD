@@ -1,4 +1,3 @@
-import 'package:app_grd/main.dart';
 import 'package:app_grd/widgets/diagnostico_text.dart';
 import 'package:app_grd/widgets/edad_text.dart';
 import 'package:app_grd/widgets/model.dart';
